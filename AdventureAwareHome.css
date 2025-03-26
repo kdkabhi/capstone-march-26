@@ -1,0 +1,9 @@
+.navbar {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.navbar-brand img {
+    width: 100px;
+    height: 100px;
+}

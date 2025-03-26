@@ -1,0 +1,55 @@
+.contact-page {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+  }
+  
+  .contact-page .card {
+    border-radius: 10px;
+  }
+  
+  .contact-page .form-label {
+    font-weight: bold;
+  }
+  
+  .contact-page .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+  }
+  
+  .contact-page .btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+  }
+  
+  .contact-page h2 {
+    color: #343a40;
+  }
+  
+  .contact-page h4 {
+    color: #343a40;
+  }
+  
+  .contact-page p {
+    color: #6c757d;
+  }
+  
+  .contact-page .list-unstyled li {
+    color: #6c757d;
+  }
+  
+  .contact-page .list-unstyled li strong {
+    color: #343a40;
+  }
+  
+  .contact-page .list-unstyled li .text-primary {
+    color: #007bff !important;
+  }
+  
+  .contact-page .list-unstyled li .text-danger {
+    color: #dc3545 !important;
+  }
+  
+  .contact-page .list-unstyled li .text-info {
+    color: #17a2b8 !important;
+  }
