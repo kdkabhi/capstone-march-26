@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useContext } from "react";
-import { Link } from "react-router-dom";
-import logo from '../capstone logo.png';
+import React, { useState, useEffect, useContext, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FaFacebook, FaInstagram, FaTwitter, FaStar, FaRegStar, FaTimes } from 'react-icons/fa';
 import './AdventureAwareHome.css';
@@ -14,13 +13,29 @@ const AdventureAwareHome = () => {
     const [favorites, setFavorites] = useState([]);
     const [selectedItinerary, setSelectedItinerary] = useState(null);
     const { user } = useContext(UserContext);
+    const location = useLocation();
+    const packageRefs = useRef({});
 
     useEffect(() => {
         fetchPackages();
         if (user) {
             fetchFavorites();
         }
-    }, [user]);
+    }, [user]); // Removed packages and location.search from dependencies to avoid re-scrolling
+
+    useEffect(() => {
+        // Scroll to package only when location changes and packages are loaded
+        const queryParams = new URLSearchParams(location.search);
+        const packageId = queryParams.get('packageId');
+        if (packageId && packages.length > 0) {
+            const targetPackage = packageRefs.current[packageId];
+            if (targetPackage) {
+                targetPackage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // Ensure the body remains scrollable
+                document.body.style.overflow = 'auto';
+            }
+        }
+    }, [location.search, packages]); // Separate effect for scrolling
 
     const fetchPackages = async () => {
         try {
@@ -43,7 +58,7 @@ const AdventureAwareHome = () => {
 
     const toggleFavorite = async (pkgId) => {
         if (!user) {
-            alert('Please login to add favorites.');
+            alert('Please login to add/remove favorites.');
             return;
         }
 
@@ -57,6 +72,8 @@ const AdventureAwareHome = () => {
             if (response.ok) {
                 const updatedFavorites = await response.json();
                 setFavorites(updatedFavorites.map(fav => fav.id));
+            } else {
+                console.error('Failed to toggle favorite');
             }
         } catch (error) {
             console.error('Error toggling favorite:', error);
@@ -81,7 +98,7 @@ const AdventureAwareHome = () => {
     };
 
     return (
-        <div>
+        <div style={{ minHeight: '100vh', overflowY: 'auto' }}> {/* Ensure root div is scrollable */}
             <Navbar user={user} />
             <div className="container" style={{ maxWidth: '1200px', padding: 0 }}>
                 <header className="text-white text-center py-5" style={{ height: '500px', width: '100%', position: 'relative' }}>
@@ -100,13 +117,22 @@ const AdventureAwareHome = () => {
                 </header>
             </div>
 
-            <div className="container mt-5">
+            <div className="container mt-5" style={{ overflowY: 'auto' }}> {/* Ensure package container is scrollable */}
                 <h2 className="text-center fw-bold">Our Packages</h2>
                 <div className="row d-flex justify-content-center">
                     {packages.map((pkg) => (
-                        <div key={pkg.id} className="col-md-4 mb-4 d-flex align-items-stretch">
+                        <div
+                            key={pkg.id}
+                            className="col-md-4 mb-4 d-flex align-items-stretch"
+                            ref={(el) => (packageRefs.current[pkg.id] = el)}
+                        >
                             <div className="card shadow-sm border-0 w-100" style={{ height: "600px" }}>
-                                <img src={`http://localhost:8080/uploads/${pkg.imageUrls[0]}`} className="card-img-top" alt={pkg.name} style={{ height: "250px", objectFit: "cover" }} />
+                                <img
+                                    src={`http://localhost:8080/uploads/${pkg.imageUrls[0]}`}
+                                    className="card-img-top"
+                                    alt={pkg.name}
+                                    style={{ height: "250px", objectFit: "cover" }}
+                                />
                                 <div className="card-body text-center">
                                     <h5 className="card-title fw-bold">{pkg.name}</h5>
                                     <p className="card-text">{pkg.description}</p>
@@ -148,6 +174,7 @@ const AdventureAwareHome = () => {
                         justify-content: center;
                         align-items: center;
                         z-index: 1000;
+                        overflow: auto; /* Allow scrolling within modal if needed */
                     }
                     .itinerary-content {
                         background: white;
